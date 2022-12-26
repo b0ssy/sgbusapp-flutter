@@ -2,6 +2,15 @@
 
 A simple SG bus app!
 
+This free and ad-less application is hosted on the Google Play Store:
+https://play.google.com/store/apps/details?id=com.sgbusapp.sgbusapp_flutter
+
+## API Key
+
+The application requires an API key from LTA's DataMall API.
+
+To configure the API key, please set it as the environment variable called **API_KEY**.
+
 ## Environment Variables
 
 | Environment Variable        | Description
