@@ -45,6 +45,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# VSCode
+.vscode/
+
 # Other files
 bak/
 todos.txt
