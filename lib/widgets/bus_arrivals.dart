@@ -403,7 +403,7 @@ class _BusArrivalsState extends State<BusArrivals> {
                       busService?.serviceNo ?? '-',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 20.0,
+                        fontSize: 18.0,
                         color: !isOperating
                             ? Theme.of(context).disabledColor
                             : isServiceNoFav

@@ -272,12 +272,10 @@ class _BusMapState extends State<BusMap> {
             ),
             Marker(
               point: latLng,
-              width: 110.0,
-              height: 75.0,
+              width: 120.0,
+              height: 80.0,
               anchorPos: AnchorPos.exactly(Anchor(55.0, -10.0)),
-              builder: (context) => _BusArrivalInfo(
-                busArrival: busArrival,
-              ),
+              builder: (context) => _BusArrivalInfo(busArrival: busArrival),
             ),
           ],
         ),
@@ -592,7 +590,7 @@ class _BusArrivalInfoState extends State<_BusArrivalInfo> {
                           widget.busArrival.serviceNo ?? '?',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontSize: 18.0,
+                            fontSize: 14.0,
                             color: Colors.black,
                           ),
                         ),
