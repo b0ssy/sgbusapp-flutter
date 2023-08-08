@@ -589,8 +589,12 @@ class _BusArrivalInfoState extends State<_BusArrivalInfo> {
                         child: Text(
                           widget.busArrival.serviceNo ?? '?',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 14.0,
+                          style: TextStyle(
+                            fontSize:
+                                (widget.busArrival.serviceNo ?? '?').length <= 3
+                                    ? 16.0
+                                    : 14.0,
+                            fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
