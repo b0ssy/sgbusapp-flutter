@@ -186,18 +186,13 @@ class Preferences extends ChangeNotifier {
       var busStops = decoded.map((e) => parseBusStop(e)).toList();
       await database.updateBusStops(busStops);
     }
+
     // bus routes
     {
       String value = await rootBundle.loadString(constants.busRoutesJsonPath);
       List<dynamic> decoded = jsonDecode(value);
       var busRoutes = decoded.map((e) => parseBusRoute(e)).toList();
       await database.updateBusRoutes(busRoutes);
-    }
-    // mrt
-    {
-      // String value = await rootBundle.loadString(constants.mrtsgCsvPath);
-      // List<MrtStation> stations = parseMrtStationsCsv(value);
-      // await database.updateMrtStations(stations);
     }
 
     // busStopsByBusStopCode

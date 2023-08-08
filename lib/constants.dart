@@ -7,6 +7,5 @@ const busServicesJsonPath = 'assets/busservices.json';
 const busServicesHashPath = 'assets/busservices.json.sha256';
 const busStopsJsonPath = 'assets/busstops.json';
 const busStopsHashPath = 'assets/busstops.json.sha256';
-const mrtsgCsvPath = 'assets/mrtsg.csv';
 const mrtImagePath = 'images/tel3_sm-en.png';
 const icon3Path = 'assets/sgbus.app.icon3.png';
