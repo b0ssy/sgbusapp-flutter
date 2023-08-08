@@ -49,6 +49,7 @@ app.*.map.json
 .vscode/
 
 # Other files
+.*/
 bak/
 todos.txt
 build_apk.bat
