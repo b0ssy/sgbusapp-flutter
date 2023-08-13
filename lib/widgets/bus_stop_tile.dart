@@ -180,10 +180,18 @@ class _BusStopTileState extends State<BusStopTile> {
                         Chip(
                           label: Text(
                             !Provider.of<Location>(context).gettingCurrentPos
-                                ? '${distance}m'
+                                ? widget.variant == BusStopTileVariant.home
+                                    ? 'nearby'
+                                    : '${distance}m'
                                 : '...',
-                            style: const TextStyle(fontSize: 12.0),
+                            style: const TextStyle(
+                              color: Colors.green,
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
+                          side: const BorderSide(color: Colors.green),
+                          backgroundColor: Colors.transparent,
                           visualDensity: const VisualDensity(
                             vertical: VisualDensity.minimumDensity,
                           ),
