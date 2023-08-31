@@ -7,7 +7,6 @@ import 'package:sgbusapp_flutter/utils/utils.dart';
 import 'settings_screen.dart';
 import '../constants.dart' as constants;
 import '../preferences.dart';
-
 import '../providers/session.dart';
 import '../widgets/bus_map.dart';
 import '../widgets/fav_page.dart';
@@ -15,6 +14,7 @@ import '../widgets/search_page.dart';
 import '../widgets/nearby_page.dart';
 import '../widgets/buses_page.dart';
 import '../widgets/mrt_page.dart';
+import '../utils/ui.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -105,45 +105,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const SettingsScreen()),
+                    UIRoute(enterChild: const SettingsScreen()),
                   );
-                  // Navigator.push(
-                  //   context,
-                  //   PageRouteBuilder(
-                  //     pageBuilder: (context, animation, secondaryAnimation) =>
-                  //         const SettingsScreen(),
-                  //     transitionsBuilder:
-                  //         (context, animation, secondaryAnimation, child) {
-                  //       return Stack(
-                  //         children: <Widget>[
-                  //           SlideTransition(
-                  //             position: Tween<Offset>(
-                  //               begin: const Offset(0.0, 0.0),
-                  //               end: const Offset(-1.0, 0.0),
-                  //             ).animate(CurvedAnimation(
-                  //               parent: animation,
-                  //               curve: Curves.ease,
-                  //             )),
-                  //             child: widget,
-                  //           ),
-                  //           SlideTransition(
-                  //             position: Tween<Offset>(
-                  //               begin: const Offset(1.0, 0.0),
-                  //               end: Offset.zero,
-                  //             ).animate(CurvedAnimation(
-                  //               parent: animation,
-                  //               curve: Curves.ease,
-                  //             )),
-                  //             child: child,
-                  //           ),
-                  //         ],
-                  //       );
-                  //     },
-                  //   ),
-                  // );
                 },
-                child: const Icon(Icons.settings, size: 26.0),
+                child: const Icon(Icons.settings_outlined, size: 26.0),
               ),
             ),
           ],

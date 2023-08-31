@@ -74,12 +74,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Settings'),
-          actions: [
-            TextButton(
-              child: const Text('Restore Defaults'),
-              onPressed: () => _restoreDefaults(),
-            ),
-          ],
         ),
         body: SettingsList(
           lightTheme: theme,
@@ -283,6 +277,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             //     ),
             //   ],
             // ),
+            _Actions(),
             _EmptyPlaceholder(),
           ],
         ),
@@ -353,8 +348,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
           'Will try to solve them ASAP!',
     );
   }
+}
 
-  _restoreDefaults() async {
+class _Actions extends AbstractSettingsSection {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Divider(),
+        Padding(
+          padding: const EdgeInsets.only(left: 16.0),
+          child: TextButton(
+            child: const Text('Restore Defaults'),
+            onPressed: () => _restoreDefaults(context),
+          ),
+        ),
+      ],
+    );
+  }
+
+  _restoreDefaults(BuildContext context) async {
     if (!await showYesCancelDialog(
       context: context,
       title: 'Are you sure you want to restore default settings?',
