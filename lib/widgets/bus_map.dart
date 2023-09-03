@@ -386,17 +386,28 @@ class _BusMapState extends State<BusMap> {
       } else {
         var busStopsByBusStopCode =
             Provider.of<Preferences>(context).busStopsByBusStopCode;
-        busStops = Provider.of<Preferences>(context)
-            .favBusStops
-            .where((e) => busStopsByBusStopCode.containsKey(e.busStopCode))
-            .map((e) => busStopsByBusStopCode[e.busStopCode]!)
-            .toList();
+        var activeBusStop = Provider.of<Session>(context).activeBusStop;
+        if (activeBusStop != null) {
+          var busStop = busStopsByBusStopCode[activeBusStop.busStopCode];
+          if (busStop != null) {
+            busStops = [busStop];
+          }
+        } else {
+          busStops = Provider.of<Preferences>(context)
+              .favBusStops
+              .where((e) => busStopsByBusStopCode.containsKey(e.busStopCode))
+              .map((e) => busStopsByBusStopCode[e.busStopCode]!)
+              .toList();
+        }
         BusStop.setUiIndex(busStops);
       }
     } else if (lastNavIndex == cNearbyPageNavIndex) {
       busStops = Provider.of<Session>(context).nearbyBusStops;
     } else if (lastNavIndex == cBusesPageNavIndex) {
       busStops = Provider.of<Session>(context).busServiceBusStops;
+    }
+    if (Provider.of<Session>(context).busArrivalBusStops.isNotEmpty) {
+      busStops = Provider.of<Session>(context).busArrivalBusStops;
     }
 
     // If zoomToBusStop exists, then move it to the last

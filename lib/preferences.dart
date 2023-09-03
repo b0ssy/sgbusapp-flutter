@@ -26,8 +26,10 @@ class Preferences extends ChangeNotifier {
   bool showMyLocation = true;
   bool showNearbyRadius = true;
   bool showDistanceForNearbyFavs = true;
+  bool showBusStopsForSelectedBusArrival = true;
   List<FavBusStop> favBusStops = [];
   var ackTapToRefreshBusArrivals = false;
+  var ackShowBusStopsForSelectedBus = false;
   var ackDragDownToRefreshNearbyBusStops = false;
   var lastNavIndex = 0;
   List<String> recentBusStopSearches = [];
@@ -84,6 +86,13 @@ class Preferences extends ChangeNotifier {
           showDistanceForNearbyFavs;
     }
 
+    // showBusStopsForSelectedBusArrival
+    {
+      showBusStopsForSelectedBusArrival =
+          prefs.getBool('showBusStopsForSelectedBusArrival') ??
+              showBusStopsForSelectedBusArrival;
+    }
+
     // favBusStops
     {
       favBusStopsByBusStopCode = {};
@@ -101,6 +110,12 @@ class Preferences extends ChangeNotifier {
     {
       ackTapToRefreshBusArrivals =
           prefs.getBool('ackTapToRefreshBusArrivals') ?? false;
+    }
+
+    // ackShowBusStopsForSelectedBus
+    {
+      ackShowBusStopsForSelectedBus =
+          prefs.getBool('ackShowBusStopsForSelectedBus') ?? false;
     }
 
     // ackDragDownToRefreshNearbyBusStops
@@ -260,6 +275,18 @@ class Preferences extends ChangeNotifier {
     }
   }
 
+  Future<void> setShowBusStopsForSelectedBusArrival(
+      bool showBusStopsForSelectedBusArrival) async {
+    if (this.showBusStopsForSelectedBusArrival !=
+        showBusStopsForSelectedBusArrival) {
+      await prefs.setBool('showBusStopsForSelectedBusArrival',
+          showBusStopsForSelectedBusArrival);
+      this.showBusStopsForSelectedBusArrival =
+          showBusStopsForSelectedBusArrival;
+      notifyListeners();
+    }
+  }
+
   Future<void> addFavBusStop(
     String busStopCode, {
     List<String>? favServiceNos,
@@ -340,6 +367,14 @@ class Preferences extends ChangeNotifier {
     await prefs.setBool(
         'ackTapToRefreshBusArrivals', ackTapToRefreshBusArrivals);
     this.ackTapToRefreshBusArrivals = ackTapToRefreshBusArrivals;
+    notifyListeners();
+  }
+
+  Future<void> setAckShowBusStopsForSelectedBus(
+      bool ackShowBusStopsForSelectedBus) async {
+    await prefs.setBool(
+        'ackShowBusStopsForSelectedBus', ackShowBusStopsForSelectedBus);
+    this.ackShowBusStopsForSelectedBus = ackShowBusStopsForSelectedBus;
     notifyListeners();
   }
 
@@ -425,6 +460,7 @@ class Preferences extends ChangeNotifier {
     await setShowMyLocation(true);
     await setShowNearbyRadius(true);
     await setShowDistanceForNearbyFavs(true);
+    await setShowBusStopsForSelectedBusArrival(true);
     ackTapToRefreshBusArrivals = false;
     ackDragDownToRefreshNearbyBusStops = false;
   }

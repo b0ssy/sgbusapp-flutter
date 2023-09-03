@@ -55,6 +55,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     var showNearbyRadius = Provider.of<Preferences>(context).showNearbyRadius;
     var showDistanceForNearbyFavs =
         Provider.of<Preferences>(context).showDistanceForNearbyFavs;
+    var showBusStopsForActiveBusArrival =
+        Provider.of<Preferences>(context).showBusStopsForSelectedBusArrival;
     // var lastDataSyncDate = Provider.of<Preferences>(context).lastDataSyncDate;
     // var dateFormat = DateFormat('dd MMM yyyy, kk:mm:ss a');
     return WillPopScope(
@@ -184,6 +186,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onToggle: (value) {
                     Provider.of<Preferences>(context, listen: false)
                         .setShowDistanceForNearbyFavs(value);
+                  },
+                ),
+                SettingsTile.switchTile(
+                  initialValue: showBusStopsForActiveBusArrival,
+                  leading: const Icon(Icons.straighten),
+                  title: const Text('Show Bus Stops'),
+                  description: const Text('for selected bus'),
+                  trailing: Switch(
+                    activeColor: Theme.of(context).colorScheme.primary,
+                    value: showBusStopsForActiveBusArrival,
+                    onChanged: (value) {
+                      Provider.of<Preferences>(context, listen: false)
+                          .setShowBusStopsForSelectedBusArrival(value);
+                    },
+                  ),
+                  onToggle: (value) {
+                    Provider.of<Preferences>(context, listen: false)
+                        .setShowBusStopsForSelectedBusArrival(value);
                   },
                 ),
               ],

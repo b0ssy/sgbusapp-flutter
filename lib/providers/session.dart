@@ -20,6 +20,7 @@ class Session extends ChangeNotifier {
   BusService? activeBusService;
   List<BusStop> searchedBusStops = [];
   List<BusStop> nearbyBusStops = [];
+  List<BusStop> busArrivalBusStops = [];
   List<BusStop> busServiceBusStops = [];
   var searchPickMap = false;
   LatLng? searchPickMapPos;
@@ -85,6 +86,13 @@ class Session extends ChangeNotifier {
   void setNearbyBusStops(List<BusStop> nearbyBusStops) {
     if (this.nearbyBusStops != nearbyBusStops) {
       this.nearbyBusStops = nearbyBusStops;
+      notifyListeners();
+    }
+  }
+
+  void setBusArrivalBusStops(List<BusStop> busArrivalBusStops) {
+    if (this.busArrivalBusStops != busArrivalBusStops) {
+      this.busArrivalBusStops = busArrivalBusStops;
       notifyListeners();
     }
   }

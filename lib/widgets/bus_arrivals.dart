@@ -38,6 +38,7 @@ class BusArrivals extends StatefulWidget {
 class _BusArrivalsState extends State<BusArrivals> {
   final _firstFavBusServiceKey = GlobalKey();
   bool _showInfo = false;
+  String? _selectedServiceNo;
   var _loading = false;
   List<BusService> _busServices = [];
   Map<String, BusArrival> _busArrivalMap = {};
@@ -64,6 +65,8 @@ class _BusArrivalsState extends State<BusArrivals> {
   Widget build(BuildContext context) {
     var ackTapToRefreshBusArrivals =
         Provider.of<Preferences>(context).ackTapToRefreshBusArrivals;
+    var ackShowBusStopsForSelectedBus =
+        Provider.of<Preferences>(context).ackShowBusStopsForSelectedBus;
     var favBusStop = Provider.of<Preferences>(context)
         .favBusStops
         .firstWhereOrNull((e) => e.busStopCode == widget.busStop.busStopCode);
@@ -150,107 +153,6 @@ class _BusArrivalsState extends State<BusArrivals> {
             ),
           ],
         ),
-        // Center(
-        //   child: SizedBox(
-        //     width: 350.0,
-        //     child: Column(
-        //       children: [
-        //         ListTile(
-        //           contentPadding: const EdgeInsets.symmetric(horizontal: 0.0),
-        //           title: Text(
-        //             widget.altDescription ??
-        //                 widget.busStop.description ??
-        //                 'N/A',
-        //             maxLines: 1,
-        //             style: TextStyle(
-        //               fontWeight: FontWeight.bold,
-        //               fontStyle: widget.altDescription?.isNotEmpty == true
-        //                   ? FontStyle.italic
-        //                   : null,
-        //             ),
-        //           ),
-        //           subtitle: Row(
-        //             children: [
-        //               SizedBox(
-        //                 width: 50.0,
-        //                 child: Text(
-        //                   widget.busStop.busStopCode ?? 'N/A',
-        //                   style: const TextStyle(fontSize: 12.0),
-        //                 ),
-        //               ),
-        //               Text(
-        //                 widget.busStop.roadName ?? 'N/A',
-        //                 style: const TextStyle(fontSize: 12.0),
-        //               ),
-        //             ],
-        //           ),
-        //           trailing: Wrap(
-        //             spacing: 16.0,
-        //             children: [
-        //               GestureDetector(
-        //                 child: const Icon(Icons.refresh),
-        //                 onTap: () {
-        //                   _update();
-        //                 },
-        //               ),
-        //               // GestureDetector(
-        //               //   child: Icon(
-        //               //     Icons.info,
-        //               //     color: _showInfo
-        //               //         ? Theme.of(context).colorScheme.primary
-        //               //         : null,
-        //               //   ),
-        //               //   onTap: () {
-        //               //     setState(() {
-        //               //       _showInfo = !_showInfo;
-        //               //     });
-        //               //   },
-        //               // ),
-        //             ],
-        //           ),
-        //         ),
-        //         Row(
-        //           mainAxisAlignment: MainAxisAlignment.center,
-        //           children: [
-        //             if (widget.variant == BusArrivalsVariant.home)
-        //               OutlinedButton(
-        //                 style: showFavServiceNos
-        //                     ? OutlinedButton.styleFrom(
-        //                         side: const BorderSide(
-        //                           width: 1.0,
-        //                           color: Colors.orange,
-        //                         ),
-        //                       )
-        //                     : null,
-        //                 child: Text(
-        //                   'Show Favourites Only',
-        //                   style: TextStyle(
-        //                     color: showFavServiceNos ? Colors.orange : null,
-        //                   ),
-        //                 ),
-        //                 onPressed: () {
-        //                   var busStopCode = widget.busStop.busStopCode;
-        //                   if (busStopCode != null) {
-        //                     Provider.of<Preferences>(context, listen: false)
-        //                         .updateFavBusStop(busStopCode,
-        //                             showFavServiceNos: !showFavServiceNos);
-        //                   }
-        //                 },
-        //               ),
-        //             // const SizedBox(width: 8.0),
-        //             // OutlinedButton(
-        //             //   child: const Text('Refresh'),
-        //             //   onPressed: () {
-        //             //     _update();
-        //             //   },
-        //             // ),
-        //           ],
-        //         ),
-        //         const SizedBox(height: 8.0),
-        //       ],
-        //     ),
-        //   ),
-        // ),
         if (_showInfo)
           SizedBox(
             width: 350.0,
@@ -363,6 +265,16 @@ class _BusArrivalsState extends State<BusArrivals> {
                   .setAckTapToRefreshBusArrivals(true);
             },
           ),
+        if (!ackShowBusStopsForSelectedBus)
+          Ack(
+            title: 'Now shows bus stops for selected bus!',
+            subtitle: 'You can turn it off in options',
+            contentPadding: const EdgeInsets.symmetric(horizontal: 32.0),
+            onPressed: () {
+              Provider.of<Preferences>(context, listen: false)
+                  .setAckShowBusStopsForSelectedBus(true);
+            },
+          ),
       ],
     );
   }
@@ -391,14 +303,22 @@ class _BusArrivalsState extends State<BusArrivals> {
               if (!_loading || busService != null) ...[
                 Expanded(
                   child: ElevatedButton(
-                    style: isServiceNoFav
+                    style: busArrival?.serviceNo != null &&
+                            busArrival?.serviceNo == _selectedServiceNo
                         ? OutlinedButton.styleFrom(
-                            side: const BorderSide(
+                            side: BorderSide(
                               width: 1.0,
-                              color: Colors.orange,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           )
-                        : null,
+                        : isServiceNoFav
+                            ? OutlinedButton.styleFrom(
+                                side: const BorderSide(
+                                  width: 1.0,
+                                  color: Colors.orange,
+                                ),
+                              )
+                            : null,
                     child: Text(
                       busService?.serviceNo ?? '-',
                       textAlign: TextAlign.center,
@@ -412,52 +332,9 @@ class _BusArrivalsState extends State<BusArrivals> {
                       ),
                     ),
                     onPressed: () async {
-                      if (!isOperating) {
-                        Provider.of<Session>(context, listen: false)
-                            .setActiveBusArrival(null);
-                        showSnackBar(
-                            context, 'Bus is currently not in operation');
-                        return;
+                      if (busArrival != null) {
+                        _selectBusArrival(busArrival, isOperating);
                       }
-                      if (widget.busStop.latitude != null &&
-                          widget.busStop.longitude != null &&
-                          busArrival.nextBus?.hasValidLocation != true) {
-                        Provider.of<Session>(context, listen: false)
-                            .setActiveBusArrival(null);
-                        showSnackBar(context, 'No bus location available');
-                        return;
-                      }
-                      await _update();
-                      Provider.of<Session>(context, listen: false)
-                          .setActiveBusArrival(busArrival);
-                      var paddingTop = widget.busStop.latitude! <
-                              busArrival.nextBus!.latitude!
-                          ? 75.0
-                          : 12.0;
-                      var paddingLeft = widget.busStop.longitude! >
-                              busArrival.nextBus!.longitude!
-                          ? 25.0
-                          : 12.0;
-                      var paddingRight = widget.busStop.longitude! <
-                              busArrival.nextBus!.longitude!
-                          ? 25.0
-                          : 12.0;
-                      FitBoundsOptions options = FitBoundsOptions(
-                        padding: EdgeInsets.only(
-                          top: paddingTop,
-                          left: paddingLeft,
-                          right: paddingRight,
-                          bottom: 12.0,
-                        ),
-                      );
-                      Provider.of<Session>(context, listen: false).fitBounds(
-                        widget.busStop.latitude!,
-                        widget.busStop.longitude!,
-                        busArrival.nextBus!.latitude!,
-                        busArrival.nextBus!.longitude!,
-                        // ignoreIfPointsWithinMapBounds: true,
-                        options: options,
-                      );
                     },
                     onLongPress: () async {
                       var busStopCode = widget.busStop.busStopCode;
@@ -691,6 +568,87 @@ class _BusArrivalsState extends State<BusArrivals> {
     );
   }
 
+  _selectBusArrival(BusArrival busArrival, bool isOperating) async {
+    // Ensure valid next bus
+    var nextBus = busArrival.nextBus;
+    if (nextBus == null) {
+      Provider.of<Session>(context, listen: false).setActiveBusArrival(null);
+      showSnackBar(context, 'No bus arrival information');
+      return;
+    }
+
+    // Bus is not in operation
+    if (!isOperating) {
+      Provider.of<Session>(context, listen: false).setActiveBusArrival(null);
+      showSnackBar(context, 'Bus is currently not in operation');
+      return;
+    }
+
+    setState(() {
+      _selectedServiceNo = busArrival.serviceNo;
+    });
+
+    // Show current bus location
+    var hasBusLocation = widget.busStop.latitude != null &&
+        widget.busStop.longitude != null &&
+        nextBus.hasValidLocation;
+    if (hasBusLocation) {
+      await _update();
+      Provider.of<Session>(context, listen: false)
+          .setActiveBusArrival(busArrival);
+
+      // Fit to bus location
+      var paddingTop =
+          widget.busStop.latitude! < nextBus.latitude! ? 75.0 : 12.0;
+      var paddingLeft =
+          widget.busStop.longitude! > nextBus.longitude! ? 25.0 : 12.0;
+      var paddingRight =
+          widget.busStop.longitude! < nextBus.longitude! ? 25.0 : 12.0;
+      FitBoundsOptions options = FitBoundsOptions(
+        padding: EdgeInsets.only(
+          top: paddingTop,
+          left: paddingLeft,
+          right: paddingRight,
+          bottom: 12.0,
+        ),
+      );
+      Provider.of<Session>(context, listen: false).fitBounds(
+        widget.busStop.latitude!,
+        widget.busStop.longitude!,
+        nextBus.latitude!,
+        nextBus.longitude!,
+        // ignoreIfPointsWithinMapBounds: true,
+        options: options,
+      );
+    } else {
+      Provider.of<Session>(context, listen: false).setActiveBusArrival(null);
+      showSnackBar(context, 'No bus location available');
+    }
+
+    // Show bus stops for selected bus
+    if (Provider.of<Preferences>(context, listen: false)
+        .showBusStopsForSelectedBusArrival) {
+      var serviceNo = busArrival.serviceNo;
+      if (serviceNo != null) {
+        // Determine which bus stop route to use
+        var busStops = await Provider.of<Preferences>(context, listen: false)
+            .database
+            .getBusStopsForBusService(serviceNo, 1);
+        if (busStops.isEmpty || busStops[0].busStopCode != nextBus.originCode) {
+          busStops = await Provider.of<Preferences>(context, listen: false)
+              .database
+              .getBusStopsForBusService(serviceNo, 2);
+        }
+        // Show bus stops
+        if (busStops.isNotEmpty) {
+          BusStop.setUiIndex(busStops);
+          Provider.of<Session>(context, listen: false)
+              .setBusArrivalBusStops(busStops);
+        }
+      }
+    }
+  }
+
   _zoomTo(bool ignoreIfWithinMapBounds) {
     var lat = widget.busStop.latitude;
     var lon = widget.busStop.longitude;
@@ -770,43 +728,6 @@ class _BusArrivalsState extends State<BusArrivals> {
     // Update active bus arrivals
     // _setActiveBusArrivals(fitBounds: fitBounds);
   }
-
-// _setActiveBusArrivals({bool? fitBounds}) {
-//   var favBusStops =
-//       Provider.of<Preferences>(context, listen: false).favBusStops;
-//   var index = favBusStops
-//       .indexWhere((e) => e.busStopCode == widget.busStop.busStopCode);
-//   List<BusArrival> activeBusArrivals = [];
-//   if (index >= 0) {
-//     for (var favServiceNo in favBusStops[index].favServiceNos ?? []) {
-//       var busArrival = _busArrivalMap[favServiceNo];
-//       if (busArrival != null) {
-//         activeBusArrivals.add(busArrival);
-//       }
-//     }
-//   }
-//   // Fit bounds on map if not empty
-//   if (activeBusArrivals.isNotEmpty && fitBounds == true) {
-//     double minLat = widget.busStop.latitude ?? 90.0;
-//     double minLon = widget.busStop.longitude ?? 180.0;
-//     double maxLat = widget.busStop.latitude ?? -90.0;
-//     double maxLon = widget.busStop.longitude ?? -190.0;
-//     for (var activeBusArrival in activeBusArrivals) {
-//       if (activeBusArrival.nextBus?.hasValidLocation == true) {
-//         minLat = min(minLat, activeBusArrival.nextBus!.latitude!);
-//         maxLat = max(maxLat, activeBusArrival.nextBus!.latitude!);
-//       }
-//       if (activeBusArrival.nextBus?.hasValidLocation == true) {
-//         minLon = min(minLon, activeBusArrival.nextBus!.longitude!);
-//         maxLon = max(maxLon, activeBusArrival.nextBus!.longitude!);
-//       }
-//     }
-//     Provider.of<Session>(context, listen: false)
-//         .fitBounds(maxLat, minLon, minLat, maxLon);
-//   }
-//   Provider.of<Session>(context, listen: false)
-//       .setActiveBusArrivals(activeBusArrivals);
-// }
 }
 
 void showBusArrivalsBottomSheet({
@@ -853,6 +774,7 @@ void showBusArrivalsBottomSheet({
       sess.setActiveBusStop(null);
       sess.setActiveBusArrival(null);
       sess.setActiveBusArrivals([]);
+      sess.setBusArrivalBusStops([]);
     });
   });
 }
